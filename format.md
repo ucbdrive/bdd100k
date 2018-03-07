@@ -11,8 +11,11 @@
             - occluded: boolean
             - truncated: boolean
             - trafficLightColor: "red|green|yellow|none"
+            - direction: "parallel|vertical" (for lanes)
         - box2d:
             - x1: pixels
             - y1: pixels
             - x2: pixels
             - y2: pixels
+        - poly2d: an array of 2D points with type (array)
+                  "L" means line and "C" means beizer curve
