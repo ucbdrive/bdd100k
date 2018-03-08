@@ -1,6 +1,10 @@
 ## 2D Bounding Box
 
 - name: string
+- attributes:
+    - weather: "rainy|snowy|clear|overcast|undefined|partly cloudy|foggy"
+    - scene: "tunnel|residential|parking lot|undefined|city street|gas stations|highway|"
+    - timeofday: "daytime|night|dawn/dusk|undefined"
 - frames [ ]:
     - timestamp: int64 (epoch time ms)
     - index: int (optional, frame index in this video)
@@ -12,6 +16,7 @@
             - truncated: boolean
             - trafficLightColor: "red|green|yellow|none"
             - direction: "parallel|vertical" (for lanes)
+            - style: "solid | dashed" (for lanes)
         - box2d:
             - x1: pixels
             - y1: pixels
