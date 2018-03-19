@@ -213,8 +213,10 @@ def convert_instance_rgb(label_path):
 
 
 def drivable2color(seg):
-    colors = [(0, 0, 0), (255, 0, 0), (0, 0, 255)]
-    color = np.zeros((seg.shape[0], seg.shape[1], 3), dtype=np.uint8)
+    colors = [[0, 0, 0, 255],
+              [217, 83, 79, 255],
+              [91, 192, 222, 255]]
+    color = np.zeros((seg.shape[0], seg.shape[1], 4), dtype=np.uint8)
     for i in range(3):
         color[seg == i, :] = colors[i]
     return color
@@ -315,10 +317,10 @@ class LabelViewer(object):
         out_paths = []
         for i in range(len(self.image_paths)):
             self.current_index = i
-            self.show_image()
             out_name = splitext(split(self.image_paths[i])[1])[0] + '.png'
             out_path = join(self.out_dir, out_name)
-            self.fig.savefig(out_path, dpi=dpi)
+            # self.show_image()
+            # self.fig.savefig(out_path, dpi=dpi)
             out_paths.append(out_path)
         if self.with_post:
             print('Post-processing')
@@ -392,9 +394,7 @@ class LabelViewer(object):
         if self.with_drivable:
             self.draw_drivable(objects)
         if self.with_lane:
-            [self.ax.add_patch(self.poly2patch(
-                a['poly2d'], closed=False, alpha=0.75))
-             for a in get_lanes(objects)]
+            self.draw_lanes(objects)
         if self.with_box2d:
             [self.ax.add_patch(self.box2rect(b['box2d']))
              for b in get_boxes(objects)]
@@ -438,9 +438,15 @@ class LabelViewer(object):
 
     def draw_drivable(self, objects):
         objects = get_areas(objects)
+        colors = np.array([[0, 0, 0, 255],
+                           [217, 83, 79, 255],
+                           [91, 192, 222, 255]]) / 255
         for obj in objects:
             if self.color_mode == 'random':
-                color = random_color()
+                if obj['category'] == 'area/drivable':
+                    color = colors[1]
+                else:
+                    color = colors[2]
                 alpha = 0.5
             else:
                 color = (
@@ -449,6 +455,29 @@ class LabelViewer(object):
                 alpha = 1
             self.ax.add_patch(self.poly2patch(
                 obj['poly2d'], closed=True, alpha=alpha, color=color))
+
+    def draw_lanes(self, objects):
+        objects = get_lanes(objects)
+        # colors = np.array([[0, 0, 0, 255],
+        #                    [217, 83, 79, 255],
+        #                    [91, 192, 222, 255]]) / 255
+        colors = np.array([[0, 0, 0, 255],
+                           [255, 0, 0, 255],
+                           [0, 0, 255, 255]]) / 255
+        for obj in objects:
+            if self.color_mode == 'random':
+                if obj['attributes']['direction'] == 'parallel':
+                    color = colors[1]
+                else:
+                    color = colors[2]
+                alpha = 0.9
+            else:
+                color = (
+                    (1 if obj['category'] == 'area/drivable' else 2) / 255.,
+                    obj['id'] / 255., 0)
+                alpha = 1
+            self.ax.add_patch(self.poly2patch(
+                obj['poly2d'], closed=False, alpha=alpha, color=color))
 
     def draw_segments(self, objects):
         color_mode = self.color_mode
