@@ -22,5 +22,6 @@
             - y1: pixels
             - x2: pixels
             - y2: pixels
-        - segments: List of segments. Each segment is an array of 2D points with type (array)
-                  "L" means line and "C" means beizer curve. Some object segmentation may contain multiple regions
+        - poly2d: Each segment is an array of 2D points with type (array)
+                  "L" means line and "C" means beizer curve.
+        - segments: List of poly2d. Some object segmentation may contain multiple regions
