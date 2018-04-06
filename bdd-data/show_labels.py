@@ -15,6 +15,7 @@ from PIL import Image
 import sys
 
 # a label and all meta information
+# Code from Cityscapes
 Label = namedtuple('Label', [
 
     'name',  # The identifier of this label, e.g. 'car', 'person', ... .
@@ -55,6 +56,8 @@ Label = namedtuple('Label', [
     'color',  # The color of this label
 ])
 
+
+# Our extended list of label types. Our train id is compatible with Cityscapes
 labels = [
     #       name                     id    trainId   category            catId     hasInstances   ignoreInEval   color
     Label(  'unlabeled'            ,  0 ,      255 , 'void'            , 0       , False        , True         , (  0,  0,  0) ),
@@ -319,8 +322,8 @@ class LabelViewer(object):
             self.current_index = i
             out_name = splitext(split(self.image_paths[i])[1])[0] + '.png'
             out_path = join(self.out_dir, out_name)
-            # self.show_image()
-            # self.fig.savefig(out_path, dpi=dpi)
+            self.show_image()
+            self.fig.savefig(out_path, dpi=dpi)
             out_paths.append(out_path)
         if self.with_post:
             print('Post-processing')
