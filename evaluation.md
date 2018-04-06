@@ -1,10 +1,11 @@
 ## Road Object Detection
 
-Following the practice of [COCO](http://host.robots.ox.ac.uk/pascal/VOC/) challenge, we use the following 6 metrics to evaluate the performance of detection:
+We use the following 3 metrics to evaluate the performance of detection:
 
 #### Average Precision (AP):
 
-
+| Metric | |
+|:---:|---|
 | AP | % AP at IoU=.50:.05:.95 (primary challenge metric) |
 | APIoU=.50 | % AP at IoU=.50 (PASCAL VOC metric) |
 | APIoU=.75 | % AP at IoU=.75 (strict metric) |
@@ -20,9 +21,7 @@ The entire result struct array is stored as a single JSON file (save via gason i
 }]
 ```
 
-Box coordinates are integers measured from the top left image corner (and are 0-indexed). `[x1, y1]` is the top left corner of the bounding box and `[x2, y2]` the lower right.
-
-`name` is the video name that the frame is extracted from. It composes of two 8-character identifiers connected '-', such as `c993615f-350c682c`. Candidates for `category` are `['bus', 'traffic light', 'traffic sign', 'person', 'bike', 'truck', 'motor', 'car', 'train', 'rider']`.
+Box coordinates are integers measured from the top left image corner (and are 0-indexed). `[x1, y1]` is the top left corner of the bounding box and `[x2, y2]` the lower right. `name` is the video name that the frame is extracted from. It composes of two 8-character identifiers connected '-', such as `c993615f-350c682c`. Candidates for `category` are `['bus', 'traffic light', 'traffic sign', 'person', 'bike', 'truck', 'motor', 'car', 'train', 'rider']`. In the current data, all the image timestamps are 1000.
 
 
 ## Segmentation
