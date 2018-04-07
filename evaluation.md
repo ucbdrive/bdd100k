@@ -16,9 +16,15 @@ We use the following 3 metrics to evaluate the performance of detection:
 The entire result struct array is stored as a single JSON file (save via gason in Matlab or json.dump in Python).
 
 ```
-[{
-"name" : str, "timestamp": 1000, "category" : str, "bbox" : [x1,y1,x2,y2], "score" : float,
-}]
+[  
+   {  
+      "name": str,
+      "timestamp": 1000,
+      "category": str,
+      "bbox": [x1, y1, x2, y2],
+      "score": float
+   }
+]
 ```
 
 Box coordinates are integers measured from the top left image corner (and are 0-indexed). `[x1, y1]` is the top left corner of the bounding box and `[x2, y2]` the lower right. `name` is the video name that the frame is extracted from. It composes of two 8-character identifiers connected '-', such as `c993615f-350c682c`. Candidates for `category` are `['bus', 'traffic light', 'traffic sign', 'person', 'bike', 'truck', 'motor', 'car', 'train', 'rider']`. In the current data, all the image timestamps are 1000.
