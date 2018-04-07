@@ -25,3 +25,8 @@
         - poly2d: Each segment is an array of 2D points with type (array)
                   "L" means line and "C" means beizer curve.
         - segments2d: List of poly2d. Some object segmentation may contain multiple regions
+
+
+
+
+Road object categories: `['bus', 'traffic light', 'traffic sign', 'person', 'bike', 'truck', 'motor', 'car', 'train', 'rider']`
