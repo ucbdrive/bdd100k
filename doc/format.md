@@ -44,6 +44,7 @@ Road object categories:
     "truck"
 ]
 ```
+They are labeld by `box2d`.
 
 Drivable area categories:
 ```
@@ -66,3 +67,5 @@ Lane marking categories:
     "lane/single yellow"
 ]
 ```
+
+Both drivable areas and lane markings are labeled by `poly2d`. Please check the visulization code [`show_labels.py`](../bdd_data/show_labels.py) for examples of drawing all the labels.
