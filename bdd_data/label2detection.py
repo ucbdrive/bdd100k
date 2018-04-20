@@ -1,6 +1,6 @@
 import json
 import os
-import os.path as osp
+from os import path as osp
 import sys
 
 

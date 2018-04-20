@@ -29,4 +29,40 @@
 
 
 
-Road object categories: `['bus', 'traffic light', 'traffic sign', 'person', 'bike', 'truck', 'motor', 'car', 'train', 'rider']`
+Road object categories:
+```
+[
+    "bike",
+    "bus",
+    "car",
+    "motor",
+    "person",
+    "rider",
+    "traffic light",
+    "traffic sign",
+    "train",
+    "truck"
+]
+```
+
+Drivable area categories:
+```
+[
+    "area/alternative",
+    "area/drivable"
+]
+```
+
+Lane marking categories:
+```
+[
+    "lane/crosswalk",
+    "lane/double other",
+    "lane/double white",
+    "lane/double yellow",
+    "lane/road curb",
+    "lane/single other",
+    "lane/single white",
+    "lane/single yellow"
+]
+```

@@ -2,6 +2,11 @@
 
 This is supporting code for [BDD Data](http://bdd-data.berkeley.edu/). Please check the data download on the homepage to obtain the dataset. This code supports BDD100K, in particular.
 
+## Dependency
+
+- Python 3
+- `pip3 install -r requirements.txt`
+
 ## Understanding the Data
 
 After being unzipped, all the files will reside in a folder named `bdd100k`. All the original videos are in `bdd100k/videos` and labels in `bdd100k/labels`. `bdd100k/images` contains the frame at 10th second in the corresponding video.

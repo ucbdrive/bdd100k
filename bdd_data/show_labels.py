@@ -1,7 +1,5 @@
 import json
 import argparse
-import pdb
-from collections import namedtuple
 from multiprocessing import Pool
 import os
 from os.path import exists, splitext, isdir, isfile, join, split, dirname
