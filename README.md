@@ -2,6 +2,8 @@
 
 This is supporting code for [BDD Data](http://bdd-data.berkeley.edu/). Please check the data download on the homepage to obtain the dataset. This code supports BDD100K, in particular.
 
+![teaser](doc/teaser.png)
+
 ## Dependency
 
 - Python 3
