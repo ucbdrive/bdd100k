@@ -3,8 +3,8 @@ rover,1,255
 sky,17,10
 car,33,13
 car_groups,161,13
-motorbicycle,34,255
-motorbicycle_group,162,255
+motorbicycle,34,17
+motorbicycle_group,162,17
 bicycle,35,18
 bicycle_group,163,18
 person,36,11
@@ -18,7 +18,7 @@ bus_group,167,15
 tricycle,40,255
 tricycle_group,168,255
 road,49,0
-siderwalk,50,255
+siderwalk,50,1
 traffic_cone,65,255
 road_pile,66,0
 fence,67,4
