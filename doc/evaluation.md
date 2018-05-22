@@ -6,9 +6,7 @@ We use the following 3 metrics to evaluate the performance of detection:
 
 | Metric | |
 |:---:|---|
-| AP | % AP at IoU=.50:.05:.95 (primary challenge metric) |
-| APIoU=.50 | % AP at IoU=.50 (PASCAL VOC metric) |
-| APIoU=.75 | % AP at IoU=.75 (strict metric) |
+| APIoU=.75 | % AP at IoU=.75 |
 
 
 #### Submission format
