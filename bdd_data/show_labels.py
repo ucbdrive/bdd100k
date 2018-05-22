@@ -16,9 +16,7 @@ from .label import labels
 
 
 def parse_args():
-    """Grab user supplied arguments using the argparse library."""
-
-    # Use argparse to get command line arguments
+    """Use argparse to get command line arguments"""
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--image", required=True,
                         help="input raw image", type=str)
@@ -47,6 +45,10 @@ def parse_args():
                         help='Set instance segmentation mode')
     parser.add_argument('--drivable', action='store_true', default=False,
                         help='Set drivable area mode')
+    parser.add_argument('--target-objects', type=str, default='',
+                        help='A comma separated list of objects. If this is '
+                             'not empty, only show images with the target '
+                             'objects.')
     args = parser.parse_args()
 
     # Check if the corresponding bounding box annotation exits
@@ -55,6 +57,8 @@ def parse_args():
     assert (isdir(args.image) and isdir(args.label)) or \
            (isfile(args.image) and isfile(args.label)), \
         "input and label should be both folders or files"
+    if len(args.target_objects) > 0:
+        args.target_objects = args.target_objects.split(',')
 
     return args
 
@@ -80,6 +84,10 @@ def get_lanes(objects):
 
 def get_boxes(objects):
     return [o for o in objects if 'box2d' in o]
+
+
+def get_target_objects(objects, targets):
+    return [o for o in objects if o['category'] in targets]
 
 
 def random_color():
@@ -185,6 +193,10 @@ class LabelViewer(object):
         self.with_box2d = not args.no_box2d
         self.with_segment = True
 
+        self.target_objects = args.target_objects
+
+        print(len(self.target_objects))
+
         self.out_dir = args.output_dir
         self.label_map = dict([(l.name, l) for l in labels])
         self.color_mode = 'random'
@@ -231,11 +243,11 @@ class LabelViewer(object):
         out_paths = []
         for i in range(len(self.image_paths)):
             self.current_index = i
-            out_name = splitext(split(self.image_paths[i])[1])[0] + '.png'
+            out_name = splitext(split(self.image_paths[i])[1])[0] + '.jpg'
             out_path = join(self.out_dir, out_name)
-            self.show_image()
-            self.fig.savefig(out_path, dpi=dpi)
-            out_paths.append(out_path)
+            if self.show_image():
+                self.fig.savefig(out_path, dpi=dpi)
+                out_paths.append(out_path)
         if self.with_post:
             print('Post-processing')
             p = Pool(10)
@@ -294,6 +306,11 @@ class LabelViewer(object):
             label = json.load(data_file)
         objects = label['frames'][0]['objects']
 
+        if len(self.target_objects) > 0:
+            objects = get_target_objects(objects, self.target_objects)
+            if len(objects) == 0:
+                return False
+
         if 'attributes' in label and self.with_attr:
             attributes = label['attributes']
             self.ax.text(
@@ -315,6 +332,7 @@ class LabelViewer(object):
         if self.with_segment:
             self.draw_segments(objects)
         self.ax.axis('off')
+        return True
 
     def next_image(self, event):
         if event.key == 'n':
@@ -325,8 +343,10 @@ class LabelViewer(object):
             return
         self.current_index = max(min(self.current_index,
                                      len(self.image_paths) - 1), 0)
-        self.show_image()
-        plt.draw()
+        if self.show_image():
+            plt.draw()
+        else:
+            self.next_image(event)
 
     def poly2patch(self, poly2d, closed=False, alpha=1., color=None):
         moves = {'L': Path.LINETO,
