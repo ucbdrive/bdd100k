@@ -243,7 +243,7 @@ class LabelViewer(object):
         out_paths = []
         for i in range(len(self.image_paths)):
             self.current_index = i
-            out_name = splitext(split(self.image_paths[i])[1])[0] + '.jpg'
+            out_name = splitext(split(self.image_paths[i])[1])[0] + '.png'
             out_path = join(self.out_dir, out_name)
             if self.show_image():
                 self.fig.savefig(out_path, dpi=dpi)
@@ -366,9 +366,9 @@ class LabelViewer(object):
         return mpatches.PathPatch(
             Path(points, codes),
             facecolor=color if closed else 'none',
-            edgecolor=color if not closed else 'none',
-            lw=0 if closed else 2 * self.scale, alpha=alpha,
-            antialiased=False)
+            edgecolor=color,  # if not closed else 'none',
+            lw=1 if closed else 2 * self.scale, alpha=alpha,
+            antialiased=False, snap=True)
 
     def draw_drivable(self, objects):
         objects = get_areas(objects)

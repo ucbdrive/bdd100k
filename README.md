@@ -31,14 +31,14 @@ python3 bdd_data/show_labels.py -i bdd100k/images/100k/train -l bdd100k/labels/1
     -s 1 -o bdd100k/out_drivable_maps/train --drivable
 ```
 
-This exporting process will take a while, so we also provide `Drivable Maps` in the downloading page, which will be `bdd100k/drivable_maps` after decompressing.
+This exporting process will take a while, so we also provide `Drivable Maps` in the downloading page, which will be `bdd100k/drivable_maps` after decompressing. There are 3 possible labels on the maps: 0 for background, 1 for direct drivable area and 2 for alternative drivable area.
 
 ### Object Detection
 
 You can export object detection in concise format by
 
 ```
-python3 bdd_data/label2detection.py bdd100k/labels/100k bdd100k/detection
+python3 bdd_data/label2det.py bdd100k/labels/100k bdd100k/detection
 ```
 
 The detection label format is below, which is the same as [our detection evaluation format](doc/evaluation.md#):

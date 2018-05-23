@@ -188,12 +188,16 @@ def evaluate_detection(gt_path, result_path):
 
 def main():
     args = parse_args()
+
     if args.task == 'drivable':
-        print(evaluate_drivable(args.gt, args.result))
+        mean, breakdown = evaluate_drivable(args.gt, args.result)
     elif args.task == 'seg':
-        print(evaluate_segmentation(args.gt, args.result, 19, 17))
+        mean, breakdown = evaluate_segmentation(args.gt, args.result, 19, 17)
     elif args.task == 'det':
-        print(evaluate_detection(args.gt, args.result))
+        mean, breakdown = evaluate_detection(args.gt, args.result)
+
+    print('{:.2f}'.format(mean),
+          ', '.join(['{:.2f}'.format(n) for n in breakdown]))
 
 
 if __name__ == '__main__':
