@@ -22,6 +22,8 @@ def label2det(label):
             if 'box2d' not in obj:
                 continue
             xy = obj['box2d']
+            if xy['x1'] >= xy['x2'] and xy['y1'] >= xy['y2']:
+                continue
             box = {'name': label['name'],
                    'timestamp': frame['timestamp'],
                    'category': obj['category'],
