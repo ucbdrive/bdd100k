@@ -123,8 +123,12 @@ def cat_pc(gt, predictions, thresholds):
         box = p['bbox']
         ovmax = -np.inf
         jmax = -1
-        gt_boxes = image_gt_boxes[p['name']]
-        gt_checked = image_gt_checked[p['name']]
+        try:
+            gt_boxes = image_gt_boxes[p['name']]
+            gt_checked = image_gt_checked[p['name']]
+        except KeyError:
+            gt_boxes = 0
+            gt_checked = None
 
         if len(gt_boxes) > 0:
             # compute overlaps
@@ -182,6 +186,7 @@ def evaluate_detection(gt_path, result_path):
         if cat in cat_pred:
             r, p, ap = cat_pc(cat_gt[cat], cat_pred[cat], thresholds)
             aps[:, i] = ap
+    aps *= 100
     mAP = np.mean(aps)
     return mAP, aps.flatten().tolist()
 
