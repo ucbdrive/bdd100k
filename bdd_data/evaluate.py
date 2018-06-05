@@ -127,7 +127,7 @@ def cat_pc(gt, predictions, thresholds):
             gt_boxes = image_gt_boxes[p['name']]
             gt_checked = image_gt_checked[p['name']]
         except KeyError:
-            gt_boxes = 0
+            gt_boxes = []
             gt_checked = None
 
         if len(gt_boxes) > 0:
