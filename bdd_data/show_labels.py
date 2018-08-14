@@ -18,7 +18,7 @@ from .label import labels
 def parse_args():
     """Use argparse to get command line arguments"""
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--image", required=True,
+    parser.add_argument("-i", "--image", required=False,
                         help="input raw image", type=str)
     parser.add_argument("-l", "--label", required=True,
                         help="corresponding bounding box annotation "
