@@ -1,6 +1,6 @@
 # BDD Data
 
-This is supporting code for [BDD100K data](http://bdd-data.berkeley.edu/).
+This is supporting code for [BDD100K data](http://bdd-data.berkeley.edu/) and [Scalabel](https://www.scalabel.ai/).
 
 Please check the data download on the homepage to obtain the dataset. This code supports BDD100K, in particular.
 
