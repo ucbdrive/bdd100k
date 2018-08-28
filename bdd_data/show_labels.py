@@ -666,16 +666,8 @@ class LabelViewer2(object):
             if len(objects) == 0:
                 return False
         
-        if 'attributes' in frame and self.with_attr:
-            attributes = frame['attributes']
-            self.ax.text(
-                25 * self.scale, 90 * self.scale,
-                '  scene: {}\nweather: {}\n   time: {}'.format(
-                    attributes['scene'], attributes['weather'],
-                    attributes['timeofday']),
-                fontproperties=self.font,
-                color='red',
-                bbox={'facecolor': 'white', 'alpha': 0.4, 'pad': 10, 'lw': 0})
+        if self.with_attr:
+            self.show_attributes(frame)
 
         if self.with_drivable:
             self.draw_drivable(objects)
@@ -815,6 +807,27 @@ class LabelViewer2(object):
         if label_id not in self.label_colors:
             self.label_colors[label_id] = random_color()
         return self.label_colors[label_id]
+
+    def show_attributes(self, frame):
+        if 'attributes' not in frame:
+            return
+        attributes = frame['attributes']
+        if attributes is None or len(attributes) == 0:
+            return
+        key_width = 0
+        for k, _ in attributes.items():
+            if len(k) > key_width:
+                key_width = len(k)
+        attr_tag = io.StringIO()
+        for k, v in attributes.items():
+            attr_tag.write('{}: {}\n'.format(
+                k.rjust(key_width, ' '), v))
+        attr_tag.seek(0)
+        self.ax.text(
+            25 * self.scale, 90 * self.scale, attr_tag.read()[:-1],
+            fontproperties=self.font,
+            color='red',
+            bbox={'facecolor': 'white', 'alpha': 0.4, 'pad': 10, 'lw': 0})
 
 
 def main():
