@@ -86,6 +86,7 @@ def get_areas_v0(objects):
     return [o for o in objects
             if 'poly2d' in o and o['category'][:4] == 'area']
 
+
 def get_areas(objects):
     return [o for o in objects
             if 'poly2d' in o and o['category'] == 'drivable area']
@@ -94,6 +95,12 @@ def get_areas(objects):
 def get_lanes(objects):
     return [o for o in objects
             if 'poly2d' in o and o['category'][:4] == 'lane']
+
+
+def get_other_poly2d(objects):
+    return [o for o in objects
+            if 'poly2d' in o and
+            (o['category'] not in ['drivable area', 'lane'])]
 
 
 def get_boxes(objects):
@@ -677,9 +684,9 @@ class LabelViewer2(object):
         if self.with_box2d:
             [self.ax.add_patch(self.box2rect(b['id'], b['box2d']))
              for b in get_boxes(objects)]
-        # if self.poly2d:
-        #     self.draw_poly2d(objects)
-        # self.ax.axis('off')
+        if self.poly2d:
+            self.draw_other_poly2d(objects)
+        self.ax.axis('off')
         return True
 
     def next_image(self, event):
@@ -763,8 +770,9 @@ class LabelViewer2(object):
                     poly['vertices'], poly['types'], closed=poly['closed'],
                     alpha=alpha, color=color))
 
-    def draw_poly2d(self, objects):
+    def draw_other_poly2d(self, objects):
         color_mode = self.color_mode
+        objects = get_other_poly2d(objects)
         for obj in objects:
             if 'poly2d' not in obj:
                 continue
@@ -774,7 +782,8 @@ class LabelViewer2(object):
             elif color_mode == 'instance':
                 try:
                     label = self.label_map[obj['category']]
-                    color = (label.trainId / 255., obj['id'] / 255., 0)
+                    color = (label.trainId / 255., (obj['id'] // 255) / 255,
+                             (obj['id'] % 255) / 255.)
                 except KeyError:
                     color = (1, 0, 0)
                 alpha = 1
