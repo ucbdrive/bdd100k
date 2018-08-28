@@ -21,13 +21,15 @@ After being unzipped, all the files will reside in a folder named `bdd100k`. All
 For example, you can view training data one by one
 
 ```
-python3 -m bdd_data.show_labels.py --image-dir bdd100k/images/100k/train -l bdd100k/labels/bdd100k_labels_images_train.json
+python3 -m bdd_data.show_labels.py --image-dir bdd100k/images/100k/train \
+    -l bdd100k/labels/bdd100k_labels_images_train.json
 ```
 
 Or export the drivable area in segmentation maps:
 
 ```
-python3 -m bdd_data.show_labels.py --image-dir bdd100k/images/100k/train -l bdd100k/labels/bdd100k_labels_images_train.json \
+python3 -m bdd_data.show_labels.py --image-dir bdd100k/images/100k/train \
+    -l bdd100k/labels/bdd100k_labels_images_train.json \
     -s 1 -o bdd100k/out_drivable_maps/train --drivable
 ```
 
@@ -38,7 +40,8 @@ This exporting process will take a while, so we also provide `Drivable Maps` in 
 You can export object detection in concise format by
 
 ```
-python3 -m bdd_data.label2det.py bdd100k/labels/bdd100k_labels_images_train.json bdd100k/detection_train.json
+python3 -m bdd_data.label2det.py bdd100k/labels/bdd100k_labels_images_train.json \
+    bdd100k/detection_train.json
 ```
 
 The detection label format is below, which is the same as [our detection evaluation format](doc/evaluation.md#):
