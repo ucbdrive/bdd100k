@@ -1,6 +1,11 @@
 import argparse
 import json
 
+__author__ = 'Fisher Yu'
+__copyright__ = 'Copyright (c) 2018, Fisher Yu'
+__email__ = 'i@yf.io'
+__license__ = 'BSD'
+
 
 def parse_args():
     """Use argparse to get command line arguments."""
