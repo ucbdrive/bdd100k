@@ -53,7 +53,7 @@ def parse_args():
                         help='A comma separated list of objects. If this is '
                              'not empty, only show images with the target '
                              'objects.')
-    parser.add_argument('--format', default='v1')
+    parser.add_argument('--format', default='v2')
     args = parser.parse_args()
 
     # Check if the corresponding bounding box annotation exits
@@ -77,9 +77,13 @@ def is_valid_file(parser, file_name):
         sys.exit(1)
 
 
-def get_areas(objects):
+def get_areas_v0(objects):
     return [o for o in objects
             if 'poly2d' in o and o['category'][:4] == 'area']
+
+def get_areas(objects):
+    return [o for o in objects
+            if 'poly2d' in o and o['category'] == 'drivable area']
 
 
 def get_lanes(objects):
@@ -156,7 +160,7 @@ def convert_drivable_rgb(label_path):
     seg = image[:, :, 0]
     seg_color = drivable2color(seg)
     image = image.astype(np.uint32)
-    instance = image[:, :, 0] * 1000 + image[:, :, 1]
+    instance = image[:, :, 0] * 1000 + image[:, :, 2]
     # instance_color = instance2color(instance)
     Image.fromarray(seg).save(
         join(label_dir, label_name + '_drivable_id.png'))
@@ -377,7 +381,7 @@ class LabelViewer(object):
             antialiased=False, snap=True)
 
     def draw_drivable(self, objects):
-        objects = get_areas(objects)
+        objects = get_areas_v0(objects)
         colors = np.array([[0, 0, 0, 255],
                            [217, 83, 79, 255],
                            [91, 192, 222, 255]]) / 255
@@ -550,13 +554,26 @@ class LabelViewer2(object):
         self.ax = self.fig.add_axes([0.0, 0.0, 1.0, 1.0], frameon=False)
 
         out_paths = []
-        for i in range(len(self.image_paths)):
-            self.frame_index = i
-            out_name = splitext(split(self.image_paths[i])[1])[0] + '.png'
+
+        self.start_index = 0
+        self.frame_index = 0
+        self.file_index = 0
+        while self.file_index < len(self.label_paths):
+            if self.label is None:
+                self.label = read_labels(self.label_paths[self.file_index])
+            out_name = splitext(split(
+                self.label[self.frame_index -
+                           self.start_index]['name'])[1])[0] + '.png'
             out_path = join(self.out_dir, out_name)
             if self.show_image():
                 self.fig.savefig(out_path, dpi=dpi)
                 out_paths.append(out_path)
+            self.frame_index += 1
+            if self.frame_index >= len(self.label):
+                self.start_index = self.frame_index
+                self.file_index += 1
+                self.label = None
+
         if self.with_post:
             print('Post-processing')
             p = Pool(10)
@@ -621,9 +638,9 @@ class LabelViewer2(object):
             self.ax.set_ylim(0, self.image_height - 1)
             self.ax.invert_yaxis()
             self.ax.add_patch(self.poly2patch(
-                [[0, 0, 'L'], [0, self.image_height - 1, 'L'],
-                 [self.image_width - 1, self.image_height - 1, 'L'],
-                 [self.image_width - 1, 0, 'L']],
+                [[0, 0], [0, self.image_height - 1],
+                 [self.image_width - 1, self.image_height - 1],
+                 [self.image_width - 1, 0]], types='LLLL',
                 closed=True, alpha=1., color='black'))
 
         if 'labels' not in frame or frame['labels'] is None:
@@ -636,27 +653,27 @@ class LabelViewer2(object):
             objects = get_target_objects(objects, self.target_objects)
             if len(objects) == 0:
                 return False
-        #
-        # if 'attributes' in label and self.with_attr:
-        #     attributes = label['attributes']
-        #     self.ax.text(
-        #         25 * self.scale, 90 * self.scale,
-        #         '  scene: {}\nweather: {}\n   time: {}'.format(
-        #             attributes['scene'], attributes['weather'],
-        #             attributes['timeofday']),
-        #         fontproperties=self.font,
-        #         color='red',
-        #         bbox={'facecolor': 'white', 'alpha': 0.4, 'pad': 10, 'lw': 0})
-        #
-        # if self.with_drivable:
-        #     self.draw_drivable(objects)
-        # if self.with_lane:
-        #     self.draw_lanes(objects)
+        
+        if 'attributes' in frame and self.with_attr:
+            attributes = frame['attributes']
+            self.ax.text(
+                25 * self.scale, 90 * self.scale,
+                '  scene: {}\nweather: {}\n   time: {}'.format(
+                    attributes['scene'], attributes['weather'],
+                    attributes['timeofday']),
+                fontproperties=self.font,
+                color='red',
+                bbox={'facecolor': 'white', 'alpha': 0.4, 'pad': 10, 'lw': 0})
+
+        if self.with_drivable:
+            self.draw_drivable(objects)
+        if self.with_lane:
+            self.draw_lanes(objects)
         if self.with_box2d:
             [self.ax.add_patch(self.box2rect(b['id'], b['box2d']))
              for b in get_boxes(objects)]
-        if self.poly2d:
-            self.draw_poly2d(objects)
+        # if self.poly2d:
+        #     self.draw_poly2d(objects)
         # self.ax.axis('off')
         return True
 
@@ -702,18 +719,21 @@ class LabelViewer2(object):
                            [91, 192, 222, 255]]) / 255
         for obj in objects:
             if self.color_mode == 'random':
-                if obj['category'] == 'area/drivable':
+                if obj['attributes']['areaType'] == 'direct':
                     color = colors[1]
                 else:
                     color = colors[2]
                 alpha = 0.5
             else:
-                color = (
-                    (1 if obj['category'] == 'area/drivable' else 2) / 255.,
-                    obj['id'] / 255., 0)
+                color = ((1 if obj['attributes']['areaType'] ==
+                            'direct' else 2) / 255.,
+                         (obj['id'] // 255) / 255,
+                         (obj['id'] % 255) / 255.)
                 alpha = 1
-            self.ax.add_patch(self.poly2patch(
-                obj['poly2d'], closed=True, alpha=alpha, color=color))
+            for poly in obj['poly2d']:
+                self.ax.add_patch(self.poly2patch(
+                    poly['vertices'], poly['types'], closed=poly['closed'],
+                    alpha=alpha, color=color))
 
     def draw_lanes(self, objects):
         objects = get_lanes(objects)
@@ -725,18 +745,18 @@ class LabelViewer2(object):
                            [0, 0, 255, 255]]) / 255
         for obj in objects:
             if self.color_mode == 'random':
-                if obj['attributes']['direction'] == 'parallel':
+                if obj['attributes']['laneDirection'] == 'parallel':
                     color = colors[1]
                 else:
                     color = colors[2]
                 alpha = 0.9
             else:
-                color = (
-                    (1 if obj['category'] == 'area/drivable' else 2) / 255.,
-                    obj['id'] / 255., 0)
+                color = (0, (obj['id'] // 255) / 255, (obj['id'] % 255) / 255.)
                 alpha = 1
-            self.ax.add_patch(self.poly2patch(
-                obj['poly2d'], closed=False, alpha=alpha, color=color))
+            for poly in obj['poly2d']:
+                self.ax.add_patch(self.poly2patch(
+                    poly['vertices'], poly['types'], closed=poly['closed'],
+                    alpha=alpha, color=color))
 
     def draw_poly2d(self, objects):
         color_mode = self.color_mode
