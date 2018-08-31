@@ -99,12 +99,12 @@ def get_lanes(objects):
 
 def get_other_poly2d(objects):
     return [o for o in objects
-            if 'poly2d' in o and
+            if 'poly2d' in o and o['poly2d'] is not None and
             (o['category'] not in ['drivable area', 'lane'])]
 
 
 def get_boxes(objects):
-    return [o for o in objects if 'box2d' in o]
+    return [o for o in objects if 'box2d' in o and o['box2d'] is not None]
 
 
 def get_target_objects(objects, targets):
@@ -350,7 +350,7 @@ class LabelViewer(object):
             self.draw_lanes(objects)
         if self.with_box2d:
             [self.ax.add_patch(self.box2rect(b['box2d']))
-             for b in   get_boxes(objects)]
+             for b in get_boxes(objects)]
         if self.with_segment:
             self.draw_segments(objects)
         self.ax.axis('off')
