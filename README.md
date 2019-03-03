@@ -35,6 +35,24 @@ python3 -m bdd_data.show_labels.py --image-dir bdd100k/images/100k/train \
 
 This exporting process will take a while, so we also provide `Drivable Maps` in the downloading page, which will be `bdd100k/drivable_maps` after decompressing. There are 3 possible labels on the maps: 0 for background, 1 for direct drivable area and 2 for alternative drivable area.
 
+To visualize the GPS trajectories provided in `bdd100k/info`, you can run the command below to produce an html file that displays a single trajectory and output the results in folder `out/`:
+
+```
+python3 -m bdd_data.show_gps_trajectory.py \
+    -i bdd100k/info/train/0000f77c-6257be58.json -o out/ -k {YOUR_API_KEY}
+```
+
+Or create html file for each GPS trajectory in a directory, for example:
+
+```
+python3 -m bdd_data.show_gps_trajectory.py \
+    -i bdd100k/info/train -o out/ -k {YOUR_API_KEY}
+```
+
+To create a Google Map API key, please follow the instruction [here](https://developers.google.com/maps/documentation/embed/get-api-key). The generated maps will look like
+
+![gps_trajectory](doc/trajectory_gmap.jpg)
+
 ### Object Detection
 
 You can export object detection in concise format by
