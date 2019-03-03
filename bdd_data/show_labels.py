@@ -665,7 +665,7 @@ class LabelViewer2(object):
             objects = get_target_objects(objects, self.target_objects)
             if len(objects) == 0:
                 return False
-        
+
         if self.with_attr:
             self.show_attributes(frame)
 
@@ -730,7 +730,7 @@ class LabelViewer2(object):
                 alpha = 0.5
             else:
                 color = ((1 if obj['attributes']['areaType'] ==
-                            'direct' else 2) / 255.,
+                         'direct' else 2) / 255.,
                          (obj['id'] // 255) / 255,
                          (obj['id'] % 255) / 255.)
                 alpha = 1

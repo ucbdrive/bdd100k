@@ -45,7 +45,7 @@ Label = namedtuple('Label', [
 
 # Our extended list of label types. Our train id is compatible with Cityscapes
 labels = [
-    #       name                     id    trainId   category            catId     hasInstances   ignoreInEval   color
+    #       name                     id    trainId   category catId      hasInstances   ignoreInEval   color
     Label(  'unlabeled'            ,  0 ,      255 , 'void'            , 0       , False        , True         , (  0,  0,  0) ),
     Label(  'dynamic'              ,  1 ,      255 , 'void'            , 0       , False        , True         , (111, 74,  0) ),
     Label(  'ego vehicle'          ,  2 ,      255 , 'void'            , 0       , False        , True         , (  0,  0,  0) ),

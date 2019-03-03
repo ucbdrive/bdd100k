@@ -1,0 +1,11 @@
+language: python
+language: go
+python:
+  - "3.6"
+before_install:
+  - sudo apt-get update
+install:
+  - sudo pip install --upgrade pip
+  - sudo pip install pycodestyle
+script:
+  - pycodestyle --show-source . --exclude=node_modules,venv,bdd_data/label.py
