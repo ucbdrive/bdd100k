@@ -2,3 +2,5 @@ matplotlib
 numpy
 pillow
 gmplot
+motmetrics
+tqdm

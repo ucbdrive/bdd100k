@@ -1,5 +1,4 @@
 import argparse
-import copy
 import json
 import os
 from collections import defaultdict
@@ -8,14 +7,19 @@ import os.path as osp
 
 import numpy as np
 from PIL import Image
+from tqdm import tqdm
 
 
 def parse_args():
     """Use argparse to get command line arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('task', choices=['seg', 'det', 'drivable'])
-    parser.add_argument('gt', help='path to ground truth')
-    parser.add_argument('result', help='path to results to be evaluated')
+    parser.add_argument('--task', '-t', choices=['seg', 'det', 'drivable',
+                        'det-tracking'])
+    parser.add_argument('--gt', '-g', help='path to ground truth')
+    parser.add_argument('--result', '-r',
+                        help='path to results to be evaluated')
+    parser.add_argument('--categories', '-c', nargs='+',
+                        help='categories to keep')
     args = parser.parse_args()
 
     return args
@@ -65,15 +69,17 @@ def evaluate_segmentation(gt_dir, result_dir, num_classes, key_length):
         i += 1
         if i % 100 == 0:
             print('Finished', i, per_class_iu(hist) * 100)
-    gt_id_set.remove(255)
+    gt_id_set.remove([255])
     print('GT id set', gt_id_set)
     ious = per_class_iu(hist) * 100
     miou = np.mean(ious[list(gt_id_set)])
-    return miou, list(ious)
+
+    print('{:.2f}'.format(miou),
+          ', '.join(['{:.2f}'.format(n) for n in list(ious)]))
 
 
 def evaluate_drivable(gt_dir, result_dir):
-    return evaluate_segmentation(gt_dir, result_dir, 3, 17)
+    evaluate_segmentation(gt_dir, result_dir, 3, 17)
 
 
 def get_ap(recalls, precisions):
@@ -187,22 +193,107 @@ def evaluate_detection(gt_path, result_path):
             r, p, ap = cat_pc(cat_gt[cat], cat_pred[cat], thresholds)
             aps[:, i] = ap
     aps *= 100
-    mAP = np.mean(aps)
-    return mAP, aps.flatten().tolist()
+    m_ap = np.mean(aps)
+    mean, breakdown = m_ap, aps.flatten().tolist()
+
+    print('{:.2f}'.format(mean),
+          ', '.join(['{:.2f}'.format(n) for n in breakdown]))
+
+
+def evaluate_det_tracking(gt_path, result_path, cats=[]):
+
+    import motmetrics as mm
+
+    gt = sorted(json.load(open(gt_path)), key=lambda l1: l1['name'])
+    pred = sorted(json.load(open(result_path)), key=lambda l2: l2['name'])
+    assert len(gt) == len(pred)
+
+    acc_dict = {}
+
+    print('Collecting IoU...')
+    for i in tqdm(range(len(gt))):
+        im_gt = gt[i]
+        im_pred = pred[i]
+
+        # image info
+        video_name = im_gt['videoName']
+        index = im_gt['index']
+
+        # group by category; skip if no gt labels
+        if im_gt['labels'] is None:
+            continue
+
+        cat_gt = group_by_key(im_gt['labels'], 'category')
+        cat_pred = group_by_key(im_pred['labels'], 'category')
+        cat_list = cat_pred.keys()
+
+        for cat in cat_list:
+
+            if not (cat in cat_gt.keys()):
+                continue
+
+            if len(cats) > 0:
+                if not (cat in cats):
+                    continue
+
+            # initialize accumulator for each category if needed
+            if cat not in acc_dict.keys():
+                acc_dict[cat] = mm.MOTAccumulator(auto_id=True)
+
+            # get IDs
+            gt_ids = ['{}-{}-{}'.format(video_name, index, l['id'])
+                      for l in cat_gt[cat]]
+            num_preds = len(cat_pred[cat])
+            pred_ids = np.linspace(1, num_preds, num_preds)
+
+            # calculate distances between gt and pred
+            gt_boxes = [[
+                            l['box2d']['x1'], l['box2d']['y1'],
+                            l['box2d']['x2'] - l['box2d']['x1'],
+                            l['box2d']['y2'] - l['box2d']['y1']
+                        ] for l in cat_gt[cat]]
+
+            pred_boxes = [[
+                            l['box2d']['x1'], l['box2d']['y1'],
+                            l['box2d']['x2'] - l['box2d']['x1'],
+                            l['box2d']['y2'] - l['box2d']['y1']
+                        ] for l in cat_pred[cat]]
+
+            distances = mm.distances.iou_matrix(
+                gt_boxes, pred_boxes, max_iou=0.5)
+
+            acc_dict[cat].update(gt_ids, pred_ids, distances)
+
+    # create summary
+
+    print('Generating matchings and summary...')
+
+    mh = mm.metrics.create()
+
+    summary = mh.compute_many([i[1] for i in acc_dict.items()],
+                              metrics=mm.metrics.motchallenge_metrics,
+                              names=[i[0] for i in acc_dict.items()])
+
+    strsummary = mm.io.render_summary(
+                summary,
+                formatters=mh.formatters,
+                namemap=mm.io.motchallenge_metric_names
+    )
+
+    print(strsummary)
 
 
 def main():
     args = parse_args()
 
     if args.task == 'drivable':
-        mean, breakdown = evaluate_drivable(args.gt, args.result)
+        evaluate_drivable(args.gt, args.result)
     elif args.task == 'seg':
-        mean, breakdown = evaluate_segmentation(args.gt, args.result, 19, 17)
+        evaluate_segmentation(args.gt, args.result, 19, 17)
     elif args.task == 'det':
-        mean, breakdown = evaluate_detection(args.gt, args.result)
-
-    print('{:.2f}'.format(mean),
-          ', '.join(['{:.2f}'.format(n) for n in breakdown]))
+        evaluate_detection(args.gt, args.result)
+    elif args.task == 'det_tracking':
+        evaluate_det_tracking(args.gt, args.result, cats=args.categories)
 
 
 if __name__ == '__main__':
