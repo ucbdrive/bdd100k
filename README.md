@@ -35,6 +35,8 @@ python3 -m bdd_data.show_labels.py --image-dir bdd100k/images/100k/train \
 
 This exporting process will take a while, so we also provide `Drivable Maps` in the downloading page, which will be `bdd100k/drivable_maps` after decompressing. There are 3 possible labels on the maps: 0 for background, 1 for direct drivable area and 2 for alternative drivable area.
 
+### Trajectories
+
 To visualize the GPS trajectories provided in `bdd100k/info`, you can run the command below to produce an html file that displays a single trajectory and output the results in folder `out/`:
 
 ```
