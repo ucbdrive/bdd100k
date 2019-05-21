@@ -8,6 +8,7 @@ import os.path as osp
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
+import pandas as pd
 
 
 def parse_args():
@@ -181,6 +182,25 @@ def cat_pc(gt, predictions, thresholds):
 
     return recalls, precisions, ap
 
+
+def merge_and_delete_classes(data, class_correspondence):
+
+    out = {}
+    for k, v in data.items():
+        k = str(k)
+
+        if not k in class_correspondence.keys():
+            continue
+
+        k_out = class_correspondence[k]
+
+        if k_out in out.keys():
+            out[k_out] += v
+        else:
+            out[k_out] = v
+
+    return out
+    
 
 def evaluate_detection(gt_path, result_path, class_correspondence_path):
     
