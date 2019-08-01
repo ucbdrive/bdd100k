@@ -147,14 +147,14 @@ def cat_pc(gt, predictions, thresholds):
             iymin = np.maximum(gt_boxes[:, 1], box[1])
             ixmax = np.minimum(gt_boxes[:, 2], box[2])
             iymax = np.minimum(gt_boxes[:, 3], box[3])
-            iw = np.maximum(ixmax - ixmin + 1., 0.)
-            ih = np.maximum(iymax - iymin + 1., 0.)
+            iw = np.maximum(ixmax - ixmin, 0.)
+            ih = np.maximum(iymax - iymin, 0.)
             inters = iw * ih
 
             # union
-            uni = ((box[2] - box[0] + 1.) * (box[3] - box[1] + 1.) +
-                   (gt_boxes[:, 2] - gt_boxes[:, 0] + 1.) *
-                   (gt_boxes[:, 3] - gt_boxes[:, 1] + 1.) - inters)
+            uni = ((box[2] - box[0]) * (box[3] - box[1]) +
+                   (gt_boxes[:, 2] - gt_boxes[:, 0]) *
+                   (gt_boxes[:, 3] - gt_boxes[:, 1]) - inters)
 
             overlaps = inters / uni
             ovmax = np.max(overlaps)
@@ -349,7 +349,7 @@ def evaluate_det_tracking(gt_path, result_path):
 
 def main():
     args = parse_args()
-    
+
     if args.task == 'drivable':
         evaluate_drivable(args.gt, args.result)
     elif args.task == 'seg':
