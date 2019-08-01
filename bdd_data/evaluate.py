@@ -115,6 +115,7 @@ def group_by_key(detections, key):
 def cat_pc(gt, predictions, thresholds):
     """
     Implementation refers to https://github.com/rbgirshick/py-faster-rcnn
+    and https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/cocoeval.py
     """
     num_gts = len(gt)
     image_gts = group_by_key(gt, 'name')
