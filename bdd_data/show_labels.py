@@ -16,6 +16,7 @@ from collections import Iterable
 import io
 
 from .label import labels
+from .geometry import Label3d
 
 __author__ = 'Fisher Yu'
 __copyright__ = 'Copyright (c) 2018, Fisher Yu'
@@ -104,7 +105,8 @@ def get_other_poly2d(objects):
 
 
 def get_boxes(objects):
-    return [o for o in objects if 'box2d' in o and o['box2d'] is not None]
+    return [o for o in objects if ('box2d' in o and o['box2d'] is not None)
+            or ('box3d' in o and o['box3d'] is not None)]
 
 
 def get_target_objects(objects, targets):
@@ -661,6 +663,10 @@ class LabelViewer2(object):
 
         objects = frame['labels']
 
+        calibration = None
+        if 'cali' in frame['intrinsics']:
+            calibration = np.array(frame['intrinsics']['cali'])
+
         if len(self.target_objects) > 0:
             objects = get_target_objects(objects, self.target_objects)
             if len(objects) == 0:
@@ -674,8 +680,17 @@ class LabelViewer2(object):
         if self.with_lane:
             self.draw_lanes(objects)
         if self.with_box2d:
-            [self.ax.add_patch(self.box2rect(b['id'], b['box2d']))
-             for b in get_boxes(objects)]
+            for b in get_boxes(objects):
+                if 'box3d' in b:
+                    occluded = False
+                    if 'Occluded' in b['attributes']:
+                        occluded = b['attributes']['Occluded']
+
+                    for line in self.box3d_to_lines(
+                            b['id'], b['box3d'], calibration, occluded):
+                        self.ax.add_patch(line)
+                else:
+                    self.ax.add_patch(self.box2rect(b['id'], b['box2d']))
         if self.poly2d:
             self.draw_other_poly2d(objects)
         self.ax.axis('off')
@@ -802,6 +817,29 @@ class LabelViewer2(object):
             linewidth=3 * self.scale, edgecolor=box_color, facecolor='none',
             fill=False, alpha=0.75
         )
+
+    def box3d_to_lines(self, label_id, box3d, calibration, occluded):
+        """generate individual bounding box from 3d label"""
+        label = Label3d.from_box3d(box3d)
+        edges = label.get_edges_with_visibility(calibration)
+
+        box_color = self.get_label_color(label_id)
+        alpha = 0.5 if occluded else 0.8
+
+        lines = []
+        for edge in edges["dashed"]:
+            lines.append(mpatches.Polygon(edge, linewidth=2 * self.scale,
+                                          linestyle=(0, (2, 2)),
+                                          edgecolor=box_color,
+                                          facecolor='none', fill=False,
+                                          alpha=alpha))
+        for edge in edges["solid"]:
+            lines.append(mpatches.Polygon(edge, linewidth=2 * self.scale,
+                                          edgecolor=box_color,
+                                          facecolor='none', fill=False,
+                                          alpha=alpha))
+
+        return lines
 
     def get_label_color(self, label_id):
         if label_id not in self.label_colors:
