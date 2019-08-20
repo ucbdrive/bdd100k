@@ -54,15 +54,15 @@ class Label3d:
 
     @classmethod
     def from_box3d(cls, box3d):
-        center = np.array(box3d["location"])
-        height, width, depth = box3d["dimension"]
+        center = np.array(box3d['location'])
+        height, width, depth = box3d['dimension']
 
         def rotate(vector):
-            if "orientation3D" in box3d:
-                rot_x, rot_y, rot_z = box3d["orientation3D"]
+            if 'orientation3D' in box3d:
+                rot_x, rot_y, rot_z = box3d['orientation3D']
                 return rotate_vector(vector, rot_x, rot_y, rot_z, center)
             else:
-                rot_y = box3d["orientation"]
+                rot_y = box3d['orientation']
                 return rotate_vector(vector, 0, rot_y + np.pi / 2, 0, center)
 
         v000 = rotate(center + np.array([-width / 2, -height / 2, -depth / 2]))
@@ -79,51 +79,50 @@ class Label3d:
         vertices = [Vertex(v, calibration) for v in self.vertices]
         v000, v001, v010, v011, v100, v101, v110, v111 = vertices
 
-        edges = {"FU": [v000, v100],  "FR": [v100, v110],
-                 "FD": [v010, v110],  "FL": [v000, v010],
-                 "MUL": [v000, v001], "MUR": [v100, v101],
-                 "MDR": [v110, v111], "MDL": [v010, v011],
-                 "BU": [v001, v101],  "BR": [v101, v111],
-                 "BD": [v011, v111],  "BL": [v001, v011]}
+        edges = {'FU': [v000, v100],  'FR': [v100, v110],
+                 'FD': [v010, v110],  'FL': [v000, v010],
+                 'MUL': [v000, v001], 'MUR': [v100, v101],
+                 'MDR': [v110, v111], 'MDL': [v010, v011],
+                 'BU': [v001, v101],  'BR': [v101, v111],
+                 'BD': [v011, v111],  'BL': [v001, v011]}
 
-        faces = {"F": {"v": [v000, v100, v110, v010],
-                       "e": ["FU", "FR", "FD", "FL"]},
-                 "B": {"v": [v101, v001, v011, v111],
-                       "e": ["BU", "BR", "BD", "BL"]},
-                 "L": {"v": [v001, v000, v010, v011],
-                       "e": ["FL", "MUL", "BL", "MDL"]},
-                 "R": {"v": [v100, v101, v111, v110],
-                       "e": ["FR", "MUR", "BR", "MDR"]},
-                 "U": {"v": [v001, v101, v100, v000],
-                       "e": ["FU", "MUR", "BU", "MUL"]},
-                 "D": {"v": [v010, v110, v111, v011],
-                       "e": ["FD", "MDR", "BD", "MDL"]}}
+        faces = {'F': {'v': [v000, v100, v110, v010],
+                       'e': ['FU', 'FR', 'FD', 'FL']},
+                 'B': {'v': [v101, v001, v011, v111],
+                       'e': ['BU', 'BR', 'BD', 'BL']},
+                 'L': {'v': [v001, v000, v010, v011],
+                       'e': ['FL', 'MUL', 'BL', 'MDL']},
+                 'R': {'v': [v100, v101, v111, v110],
+                       'e': ['FR', 'MUR', 'BR', 'MDR']},
+                 'U': {'v': [v001, v101, v100, v000],
+                       'e': ['FU', 'MUR', 'BU', 'MUL']},
+                 'D': {'v': [v010, v110, v111, v011],
+                       'e': ['FD', 'MDR', 'BD', 'MDL']}}
 
-        face_pairs = ["FB", "LR", "UD"]
+        face_pairs = ['FB', 'LR', 'UD']
 
-        dashed_edges = {"FU": True,  "FR": True, "FD": True,  "FL": True,
-                        "MUL": True, "MUR": True, "MDR": True, "MDL": True,
-                        "BU": True,  "BR": True, "BD": True,  "BL": True}
+        dashed_edges = {'FU': True,  'FR': True, 'FD': True,  'FL': True,
+                        'MUL': True, 'MUR': True, 'MDR': True, 'MDL': True,
+                        'BU': True,  'BR': True, 'BD': True,  'BL': True}
         for pair in face_pairs:
             face1, face2 = pair
-            cw1 = check_clockwise([v.v2d for v in faces[face1]["v"]])
-            cw2 = check_clockwise([v.v2d for v in faces[face2]["v"]])
+            cw1 = check_clockwise([v.v2d for v in faces[face1]['v']])
+            cw2 = check_clockwise([v.v2d for v in faces[face2]['v']])
             if cw1 != cw2:
-                vertices1 = np.array([v.v3d for v in faces[face1]["v"]])
-                vertices2 = np.array([v.v3d for v in faces[face2]["v"]])
+                vertices1 = np.array([v.v3d for v in faces[face1]['v']])
+                vertices2 = np.array([v.v3d for v in faces[face2]['v']])
                 dist1 = np.linalg.norm(np.median(vertices1, axis=0))
                 dist2 = np.linalg.norm(np.median(vertices2, axis=0))
                 solid_face = face1 if dist1 < dist2 else face2
-                for edge in faces[solid_face]["e"]:
+                for edge in faces[solid_face]['e']:
                     dashed_edges[edge] = False
 
-        edges_with_visibility = {"dashed": [], "solid": []}
+        edges_with_visibility = {'dashed': [], 'solid': []}
         for edge in edges:
             if dashed_edges[edge]:
-                edges_with_visibility["dashed"].append(
+                edges_with_visibility['dashed'].append(
                     [v.v2d for v in edges[edge]])
             else:
-                edges_with_visibility["solid"].append(
+                edges_with_visibility['solid'].append(
                     [v.v2d for v in edges[edge]])
         return edges_with_visibility
-

@@ -827,13 +827,13 @@ class LabelViewer2(object):
         alpha = 0.5 if occluded else 0.8
 
         lines = []
-        for edge in edges["dashed"]:
+        for edge in edges['dashed']:
             lines.append(mpatches.Polygon(edge, linewidth=2 * self.scale,
                                           linestyle=(0, (2, 2)),
                                           edgecolor=box_color,
                                           facecolor='none', fill=False,
                                           alpha=alpha))
-        for edge in edges["solid"]:
+        for edge in edges['solid']:
             lines.append(mpatches.Polygon(edge, linewidth=2 * self.scale,
                                           edgecolor=box_color,
                                           facecolor='none', fill=False,
