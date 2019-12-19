@@ -381,7 +381,10 @@ class LabelViewer(object):
 
         if closed:
             points.append(points[0])
-            codes.append(Path.CLOSEPOLY)
+            if codes[-1] == 4:
+                codes.append(Path.LINETO)
+            else:
+                codes.append(Path.CLOSEPOLY)
 
         if color is None:
             color = random_color()
