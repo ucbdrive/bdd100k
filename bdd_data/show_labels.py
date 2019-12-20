@@ -667,7 +667,7 @@ class LabelViewer2(object):
         objects = frame['labels']
 
         calibration = None
-        if 'cali' in frame['intrinsics']:
+        if 'intrinsics' in frame and 'cali' in frame['intrinsics']:
             calibration = np.array(frame['intrinsics']['cali'])
 
         if len(self.target_objects) > 0:
