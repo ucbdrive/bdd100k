@@ -48,8 +48,8 @@ def transform(annFile):
                      "box2d": {
                        "x1": ann["bbox"][0],
                        "y1": ann["bbox"][1],
-                       "x2": ann["bbox"][0] + ann["bbox"][2] - 1,
-                       "y2": ann["bbox"][1] + ann["bbox"][3] - 1,
+                       "x2": ann["bbox"][0] + ann["bbox"][2],
+                       "y2": ann["bbox"][1] + ann["bbox"][3],
                      }}
             det_dict["labels"].append(label)
         bdd_label.append(det_dict)

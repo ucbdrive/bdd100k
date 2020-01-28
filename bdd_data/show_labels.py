@@ -15,8 +15,8 @@ import sys
 from collections import Iterable
 import io
 
-from .label import labels
-from .geometry import Label3d
+from label import labels
+from geometry import Label3d
 
 __author__ = 'Fisher Yu'
 __copyright__ = 'Copyright (c) 2018, Fisher Yu'
