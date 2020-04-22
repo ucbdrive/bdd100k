@@ -64,28 +64,6 @@ To create a Google Map API key, please follow the instruction [here](https://dev
 
 ![gps_trajectory](doc/trajectory_gmap.jpg)
 
-### Object Detection
-
-You can export object detection in concise format by
-
-```
-python3 -m bdd_data.label2det bdd100k/labels/bdd100k_labels_images_train.json \
-    bdd100k/detection_train.json
-```
-
-The detection label format is below, which is the same as [our detection evaluation format](doc/evaluation.md#):
-
-```
-[
-   {
-      "name": str,
-      "timestamp": 1000,
-      "category": str,
-      "bbox": [x1, y1, x2, y2],
-      "score": float
-   }
-]
-```
 
 ### Semantic Segmentation
 
