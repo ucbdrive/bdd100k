@@ -1,11 +1,20 @@
-# BDD Data
+# BDD100K
 
-This is supporting code for [BDD100K data](http://bdd-data.berkeley.edu/) and [Scalabel](https://www.scalabel.ai/).
-
-Please check the data download on the homepage to obtain the dataset. This code supports BDD100K, in particular.
+![teaser](doc/teaser.jpg)
 
 
-![teaser](doc/teaser.png)
+We construct BDD100K, the largest open driving video dataset with 100K videos and 10 tasks to evaluate the exciting progress of image recognition algorithms on autonomous driving. Each video has 40 seconds and a high resolution. The dynamic outdoor scenes and complicated ego-vehicle motion make the tasks even more challenging. The dataset possesses geographic, environmental, and weather diversity, which is useful for training models that are less likely to be surprised by new conditions. The perception tasks on this dataset include image tagging, lane detection, drivable area segmentation, road object detection, semantic segmentation, instance segmentation, multi-object detection tracking, multi-object segmentation tracking, domain adaptation,  and imitation learning. This repo is the supporting code for [BDD100K data](https://arxiv.org/abs/1805.04687) and [Scalabel](https://www.scalabel.ai/). The data downloading is available at [BDD100K data website](https://bdd-data.berkeley.edu/). To cite the dataset in your paper,
+
+```
+@InProceedings{bdd100k,
+    author = {Yu, Fisher and Chen, Haofeng and Wang, Xin and Xian, Wenqi and Chen, Yingying and Liu, Fangchen and Madhavan, Vashisht and Darrell, Trevor},
+    title = {BDD100K: A Diverse Driving Dataset for Heterogeneous Multitask Learning},
+    booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month = {June},
+    year = {2020}
+}
+```
+
 
 ## Dependency
 
@@ -21,14 +30,14 @@ After being unzipped, all the files will reside in a folder named `bdd100k`. All
 For example, you can view training data one by one
 
 ```
-python3 -m bdd_data.show_labels.py --image-dir bdd100k/images/100k/train \
+python3 -m bdd_data.show_labels --image-dir bdd100k/images/100k/train \
     -l bdd100k/labels/bdd100k_labels_images_train.json
 ```
 
 Or export the drivable area in segmentation maps:
 
 ```
-python3 -m bdd_data.show_labels.py --image-dir bdd100k/images/100k/train \
+python3 -m bdd_data.show_labels --image-dir bdd100k/images/100k/train \
     -l bdd100k/labels/bdd100k_labels_images_train.json \
     -s 1 -o bdd100k/out_drivable_maps/train --drivable
 ```
@@ -40,14 +49,14 @@ This exporting process will take a while, so we also provide `Drivable Maps` in 
 To visualize the GPS trajectories provided in `bdd100k/info`, you can run the command below to produce an html file that displays a single trajectory and output the results in folder `out/`:
 
 ```
-python3 -m bdd_data.show_gps_trajectory.py \
+python3 -m bdd_data.show_gps_trajectory \
     -i bdd100k/info/train/0000f77c-6257be58.json -o out/ -k {YOUR_API_KEY}
 ```
 
 Or create html file for each GPS trajectory in a directory, for example:
 
 ```
-python3 -m bdd_data.show_gps_trajectory.py \
+python3 -m bdd_data.show_gps_trajectory \
     -i bdd100k/info/train -o out/ -k {YOUR_API_KEY}
 ```
 
@@ -60,7 +69,7 @@ To create a Google Map API key, please follow the instruction [here](https://dev
 You can export object detection in concise format by
 
 ```
-python3 -m bdd_data.label2det.py bdd100k/labels/bdd100k_labels_images_train.json \
+python3 -m bdd_data.label2det bdd100k/labels/bdd100k_labels_images_train.json \
     bdd100k/detection_train.json
 ```
 
