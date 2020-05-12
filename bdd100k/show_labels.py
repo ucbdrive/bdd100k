@@ -694,6 +694,20 @@ class LabelViewer2(object):
                         self.ax.add_patch(line)
                 else:
                     self.ax.add_patch(self.box2rect(b['id'], b['box2d']))
+                    text = b['category'][:3]
+                    if b['attributes']['Occluded']:
+                        text += ',o'
+                    if b['attributes']['Truncated']:
+                        text += ',t'
+                    if b['attributes']['Crowd']:
+                        text += ',c'
+                    [self.ax.text(
+                        (b['box2d']['x1']) * self.scale,
+                        (b['box2d']['y1'] - 4) * self.scale,
+                        text,
+                        fontsize=10*self.scale,
+                        bbox={'facecolor': 'white', 'edgecolor': 'none',
+                              'alpha': 0.5, 'boxstyle': 'square,pad=0.1'})]
         if self.poly2d:
             self.draw_other_poly2d(objects)
         self.ax.axis('off')
@@ -812,13 +826,14 @@ class LabelViewer2(object):
         x2 = box2d['x2']
         y2 = box2d['y2']
 
-        box_color = self.get_label_color(label_id)
-
+        box_color = self.get_label_color(label_id).tolist()
         # Draw and add one box to the figure
         return mpatches.Rectangle(
             (x1, y1), x2 - x1, y2 - y1,
-            linewidth=3 * self.scale, edgecolor=box_color, facecolor='none',
-            fill=False, alpha=0.75
+            linewidth=2 * self.scale,
+            edgecolor=box_color+[0.75],
+            facecolor=box_color+[0.25],
+            fill=True
         )
 
     def box3d_to_lines(self, label_id, box3d, calibration, occluded):
