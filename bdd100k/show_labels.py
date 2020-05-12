@@ -702,10 +702,12 @@ class LabelViewer2(object):
                     if b['attributes']['Crowd']:
                         text += ',c'
                     [self.ax.text(
-                        (b['box2d']['x1']) * self.scale, (b['box2d']['y1'] - 4) * self.scale,
+                        (b['box2d']['x1']) * self.scale,
+                        (b['box2d']['y1'] - 4) * self.scale,
                         text,
                         fontsize=10*self.scale,
-                        bbox={'facecolor': 'white', 'edgecolor': 'none', 'alpha': 0.5, 'boxstyle': 'square,pad=0.1'})]
+                        bbox={'facecolor': 'white', 'edgecolor': 'none',
+                              'alpha': 0.5, 'boxstyle': 'square,pad=0.1'})]
         if self.poly2d:
             self.draw_other_poly2d(objects)
         self.ax.axis('off')
@@ -828,7 +830,9 @@ class LabelViewer2(object):
         # Draw and add one box to the figure
         return mpatches.Rectangle(
             (x1, y1), x2 - x1, y2 - y1,
-            linewidth=2 * self.scale, edgecolor=box_color+[0.75], facecolor=box_color+[0.25],
+            linewidth=2 * self.scale,
+            edgecolor=box_color+[0.75],
+            facecolor=box_color+[0.25],
             fill=True
         )
 
