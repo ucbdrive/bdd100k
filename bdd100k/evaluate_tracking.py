@@ -148,7 +148,7 @@ def mmeval(anns, all_results, cats_mapping=None):
     summary['motp'] = (1 - summary['motp']) * 100
     summary['mota'] = summary['mota'] * 100
 
-    print(summary)
+    # print(summary)
     out = {k: v for k, v in summary.to_dict().items()}
     return out
 
@@ -225,10 +225,11 @@ if __name__ == '__main__':
     # average by class
     scores.append('mmota: {}'.format(np.mean([v for k, v in eval_res['mota'].items() if k != 'OVERALL' and v == v])))
     scores.append('mmotp: {}'.format(np.mean([v for k, v in eval_res['motp'].items() if k != 'OVERALL' and v == v])))
+    
     eval_res_super = mmeval(anns, res, cats_mapping=super_category_map)
     [scores.append('{}_{}: {}'.format(k1, k2, v)) for k1 in eval_res_super.keys() for k2, v in eval_res_super[k1].items() if not k2 == 'OVERALL']
 
-    output_filename = os.path.join(outDir, 'scores.txt')
+    output_filename = os.path.join(args.out_dir, 'scores.txt')
     output_file = open(output_filename, 'w')
     output_file.write('\n'.join(scores))
     output_file.flush()
