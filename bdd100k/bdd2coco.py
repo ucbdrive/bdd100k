@@ -46,7 +46,8 @@ def bdd2coco_det(labels):
         {"supercategory": "none", "id": 7, "name": "motorcycle"},
         {"supercategory": "none", "id": 8, "name": "bicycle"},
         {"supercategory": "none", "id": 9, "name": "traffic light"},
-        {"supercategory": "none", "id": 10, "name": "traffic sign"}
+        {"supercategory": "none", "id": 10, "name": "traffic sign"},
+        {"supercategory": "none", "id": 11, "name": "ignored"}
     ]
     attr_id_dict = {i['name']: i['id'] for i in coco['categories']}
 
@@ -60,33 +61,33 @@ def bdd2coco_det(labels):
 
         image['id'] = counter
 
-        empty_image = True
+        if i['labels']:
+            for l in i['labels']:
+                # skip for drivable area and lane marking
+                if not 'box2d' in l:
+                    continue
+                annotation = dict()
+                annotation["iscrowd"] = int(l['attributes']['crowd']) if 'crowd' in l['attributes'] else 0
+                annotation["image_id"] = image['id']
 
-        for l in i['labels']:
-            # skip for drivable area and lane marking
-            if not 'box2d' in l:
-                continue
-            annotation = dict()
-            empty_image = False
-            annotation["iscrowd"] = 0
-            annotation["image_id"] = image['id']
+                x1 = l['box2d']['x1']
+                y1 = l['box2d']['y1']
+                x2 = l['box2d']['x2']
+                y2 = l['box2d']['y2']
 
-            x1 = l['box2d']['x1']
-            y1 = l['box2d']['y1']
-            x2 = l['box2d']['x2']
-            y2 = l['box2d']['y2']
+                annotation['bbox'] = [x1, y1, x2-x1, y2-y1]
+                annotation['area'] = float((x2 - x1) * (y2 - y1))
+                # fix legacy naming
+                if l['category'] in naming_replacement_dict:
+                    l['category'] = naming_replacement_dict[l['category']]
+                category_ignored = l['category'] not in attr_id_dict
 
-            annotation['bbox'] = [x1, y1, x2-x1, y2-y1]
-            annotation['area'] = float((x2 - x1) * (y2 - y1))
-            category_ignored = l['category'] in attr_id_dict
-            annotation['category_id'] = attr_id_dict[naming_replacement_dict[l['category']] if l['category'] in naming_replacement_dict else l['category']]
-            annotation['ignore'] = int(category_ignored)
-            annotation['id'] = l['id']
-            annotation['segmentation'] = [[x1, y1, x1, y2, x2, y2, x2, y1]]
-            coco['annotations'].append(annotation)
-
-
-        if empty_image:
+                annotation['category_id'] = attr_id_dict['ignored'] if category_ignored else attr_id_dict[l['category']]
+                annotation['ignore'] = int(category_ignored)
+                annotation['id'] = l['id']
+                annotation['segmentation'] = [[x1, y1, x1, y2, x2, y2, x2, y1]]
+                coco['annotations'].append(annotation)
+        else:
             continue
 
         coco['images'].append(image)
