@@ -241,23 +241,23 @@ def evaluate_det_tracking(gt_path, result_path, cats=[]):
                 acc_dict[cat] = mm.MOTAccumulator(auto_id=True)
 
             # get IDs
-            gt_ids = ['{}-{}-{}'.format(video_name, index, l['id'])
-                      for l in cat_gt[cat]]
+            gt_ids = ['{}-{}-{}'.format(video_name, index, label['id'])
+                      for label in cat_gt[cat]]
             num_preds = len(cat_pred[cat])
             pred_ids = np.linspace(1, num_preds, num_preds)
 
             # calculate distances between gt and pred
             gt_boxes = [[
-                            l['box2d']['x1'], l['box2d']['y1'],
-                            l['box2d']['x2'] - l['box2d']['x1'],
-                            l['box2d']['y2'] - l['box2d']['y1']
-                        ] for l in cat_gt[cat]]
+                            label['box2d']['x1'], label['box2d']['y1'],
+                            label['box2d']['x2'] - label['box2d']['x1'],
+                            label['box2d']['y2'] - label['box2d']['y1']
+                        ] for label in cat_gt[cat]]
 
             pred_boxes = [[
-                            l['box2d']['x1'], l['box2d']['y1'],
-                            l['box2d']['x2'] - l['box2d']['x1'],
-                            l['box2d']['y2'] - l['box2d']['y1']
-                        ] for l in cat_pred[cat]]
+                            label['box2d']['x1'], label['box2d']['y1'],
+                            label['box2d']['x2'] - label['box2d']['x1'],
+                            label['box2d']['y2'] - label['box2d']['y1']
+                        ] for label in cat_pred[cat]]
 
             distances = mm.distances.iou_matrix(
                 gt_boxes, pred_boxes, max_iou=0.5)
