@@ -12,7 +12,7 @@ def parse_arguments():
           help="path to coco label file",
     )
     parser.add_argument(
-          "--save_path", "-s"
+          "--save_path", "-s",
           default="/save/path",
           help="path to save bdd formatted label file",
     )
