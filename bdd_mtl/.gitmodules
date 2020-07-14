@@ -1,0 +1,3 @@
+[submodule "mmcv"]
+	path = mmcv
+	url = https://github.com/xanderchf/mmcv.git
