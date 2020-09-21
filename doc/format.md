@@ -76,7 +76,7 @@ Drivable area category is `drivable area`. There are two area types `areaType`:
 ]
 ```
 
-Lane marking category is `lane`. There are 8 lane styles `laneStyle`:
+Lane marking category is `lane`. There are 8 lane types `laneTypes`:
 ```
 [
     "crosswalk",
@@ -90,7 +90,7 @@ Lane marking category is `lane`. There are 8 lane styles `laneStyle`:
 ]
 ```
 
-Both drivable areas and lane markings are labeled by `poly2d`. Please check the visulization code [`show_labels.py`](../bdd_data/show_labels.py) for examples of drawing all the labels.
+Both drivable areas and lane markings are labeled by `poly2d`. Please check the visulization code [`show_labels.py`](../bdd100k/show_labels.py) for examples of drawing all the labels.
 
 
 ## Old Format (Before 08-28-2018)

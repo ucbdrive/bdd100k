@@ -120,9 +120,9 @@ def random_color():
 def seg2color(seg):
     num_ids = 20
     train_colors = np.zeros((num_ids, 3), dtype=np.uint8)
-    for l in labels:
-        if l.trainId < 255:
-            train_colors[l.trainId] = l.color
+    for label in labels:
+        if label.trainId < 255:
+            train_colors[label.trainId] = label.color
     color = np.zeros((seg.shape[0], seg.shape[1], 3), dtype=np.uint8)
     for i in range(num_ids):
         color[seg == i, :] = train_colors[i]
@@ -222,7 +222,7 @@ class LabelViewer(object):
             print('Only showing objects:', self.target_objects)
 
         self.out_dir = args.output_dir
-        self.label_map = dict([(l.name, l) for l in labels])
+        self.label_map = dict([(label.name, label) for label in labels])
         self.color_mode = 'random'
 
         self.image_width = 1280
@@ -525,7 +525,7 @@ class LabelViewer2(object):
             print('Only showing objects:', self.target_objects)
 
         self.out_dir = args.output_dir
-        self.label_map = dict([(l.name, l) for l in labels])
+        self.label_map = dict([(label.name, label) for label in labels])
         self.color_mode = 'random'
         self.label_colors = {}
 
@@ -684,16 +684,33 @@ class LabelViewer2(object):
             self.draw_lanes(objects)
         if self.with_box2d:
             for b in get_boxes(objects):
+                attributes = {}
+                if 'attributes' in b:
+                    attributes = b['attributes']
                 if 'box3d' in b:
                     occluded = False
-                    if 'Occluded' in b['attributes']:
-                        occluded = b['attributes']['Occluded']
+                    if 'occluded' in attributes:
+                        occluded = attributes['occluded']
 
                     for line in self.box3d_to_lines(
                             b['id'], b['box3d'], calibration, occluded):
                         self.ax.add_patch(line)
                 else:
                     self.ax.add_patch(self.box2rect(b['id'], b['box2d']))
+                    text = b['category'][:3]
+                    if 'occluded' in attributes and attributes['occluded']:
+                        text += ',o'
+                    if 'truncated' in attributes and attributes['truncated']:
+                        text += ',t'
+                    if 'crowd' in attributes and attributes['crowd']:
+                        text += ',c'
+                    [self.ax.text(
+                        (b['box2d']['x1']) * self.scale,
+                        (b['box2d']['y1'] - 4) * self.scale,
+                        text,
+                        fontsize=10*self.scale,
+                        bbox={'facecolor': 'white', 'edgecolor': 'none',
+                              'alpha': 0.5, 'boxstyle': 'square,pad=0.1'})]
         if self.poly2d:
             self.draw_other_poly2d(objects)
         self.ax.axis('off')
@@ -812,13 +829,14 @@ class LabelViewer2(object):
         x2 = box2d['x2']
         y2 = box2d['y2']
 
-        box_color = self.get_label_color(label_id)
-
+        box_color = self.get_label_color(label_id).tolist()
         # Draw and add one box to the figure
         return mpatches.Rectangle(
             (x1, y1), x2 - x1, y2 - y1,
-            linewidth=3 * self.scale, edgecolor=box_color, facecolor='none',
-            fill=False, alpha=0.75
+            linewidth=2 * self.scale,
+            edgecolor=box_color+[0.75],
+            facecolor=box_color+[0.25],
+            fill=True
         )
 
     def box3d_to_lines(self, label_id, box3d, calibration, occluded):
