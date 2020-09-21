@@ -8,20 +8,20 @@ from collections import defaultdict
 def parse_arguments():
     parser = argparse.ArgumentParser(description='BDD100K to COCO format')
     parser.add_argument(
-          "-i", "--in_path",
-          default="/input/path/",
-          help="path to detection JSON file or tracking base folder",
+        "-i", "--in_path",
+        default="/input/path/",
+        help="path to detection JSON file or tracking base folder",
     )
     parser.add_argument(
-          "-o", "--out_path",
-          default="/output/path",
-          help="path to save coco formatted label file",
+        "-o", "--out_path",
+        default="/output/path",
+        help="path to save coco formatted label file",
     )
     parser.add_argument(
-          "-m", "--mode",
-          default="det",
-          choices=["det", "track"],
-          help="conversion mode: detection or tracking",
+        "-m", "--mode",
+        default="det",
+        choices=["det", "track"],
+        help="conversion mode: detection or tracking",
     )
     return parser.parse_args()
 
@@ -67,7 +67,8 @@ def bdd2coco_det(labels):
                 if not 'box2d' in l:
                     continue
                 annotation = dict()
-                annotation["iscrowd"] = int(l['attributes']['crowd']) if 'crowd' in l['attributes'] else 0
+                annotation["iscrowd"] = int(
+                    l['attributes']['crowd']) if 'crowd' in l['attributes'] else 0
                 annotation["image_id"] = image['id']
 
                 x1 = l['box2d']['x1']
